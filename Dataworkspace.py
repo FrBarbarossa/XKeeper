@@ -43,13 +43,13 @@ def get_folder(name: str) -> str:
 def login(name: str, password: str) -> bool:
     user = list(cur.execute("SELECT password FROM users WHERE username=(?)", (name,)))
     if user:
-        psw = bcrypt.hashpw(password.encode(), salt)
-        print(user[0][0], psw)
-        if user[0][0] == psw:
+        psw = bcrypt.checkpw(password.encode(), user[0][0])
+        if psw:
             return True
     return False
 
 
-print(insert_user('ali2', '123'))
-print(login('ali2', '123'))
+# print(insert_user('ali2', '123'))
+print(login('ali2', '1223'))
 # print(insert_user('BLANK', '1234fas'))
+
