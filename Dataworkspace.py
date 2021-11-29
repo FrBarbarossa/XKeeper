@@ -1,9 +1,10 @@
 import sqlite3
 import bcrypt
+from typing import Union
 
 salt = bcrypt.gensalt()
 
-conn = sqlite3.connect('usersdat.db')
+conn = sqlite3.connect('usersdat.db', check_same_thread=False)
 cur = conn.cursor()
 
 cur.execute("""CREATE TABLE IF NOT EXISTS users(
@@ -12,9 +13,17 @@ cur.execute("""CREATE TABLE IF NOT EXISTS users(
    password TEXT);
 """)
 conn.commit()
+
 cur.execute("""CREATE TABLE IF NOT EXISTS folders(
    userid INTEGER PRIMARY KEY,
    folderplace TEXT);
+""")
+conn.commit()
+
+cur.execute("""CREATE TABLE IF NOT EXISTS authed(
+    id INTEGER PRIMARY KEY,
+   tguserid TEXT,
+   accname TEXT);
 """)
 conn.commit()
 
@@ -49,7 +58,21 @@ def login(name: str, password: str) -> bool:
     return False
 
 
-# print(insert_user('ali2', '123'))
-print(login('ali2', '1223'))
-# print(insert_user('BLANK', '1234fas'))
+def check_auth(userid: int) -> Union[bool, str]:
+    account = list(cur.execute('SELECT accname FROM authed WHERE tguserid=(?)', (str(userid),)))
+    if account:
+        print(account)
+        return True
+    return False
 
+
+def auth(userid: int, account: str) -> None:
+    cur.execute("INSERT INTO authed (tguserid, accname) VALUES(?,?);", (str(userid), account))
+    conn.commit()
+
+# print(insert_user('ali2', '123'))
+# print(login('ali2', '1223'))
+# print(insert_user('BLANK', '1234fas'))
+# cur.execute("INSERT INTO authed (tguserid, accname) VALUES(?,?);", ('570805623', 'sasda'))
+# conn.commit()
+# print(check_auth(570805623))
