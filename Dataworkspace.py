@@ -61,13 +61,17 @@ def login(name: str, password: str) -> bool:
 def check_auth(userid: int) -> Union[bool, str]:
     account = list(cur.execute('SELECT accname FROM authed WHERE tguserid=(?)', (str(userid),)))
     if account:
-        print(account)
         return True
     return False
 
 
 def auth(userid: int, account: str) -> None:
     cur.execute("INSERT INTO authed (tguserid, accname) VALUES(?,?);", (str(userid), account))
+    conn.commit()
+
+
+def logout(userid: int) -> None:
+    cur.execute("DELETE FROM authed WHERE tguserid=(?)", (str(userid),))
     conn.commit()
 
 # print(insert_user('ali2', '123'))
